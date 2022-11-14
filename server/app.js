@@ -15,7 +15,6 @@ socketio.on("connection", socket => {
   console.log("connect: ", socket.id)
   socketio.emit("new", socket.id)
   socket.on("move", msg => {
-    console.log(msg)
     socketio.emit("move", {id: socket.id, data: msg})
   });
   socket.on("disconnecting", (reason) => {
