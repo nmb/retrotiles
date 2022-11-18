@@ -151,7 +151,7 @@ export class Player {
         this.drawPlayer(p, context)
       }
     }
-    this.drawPlayer(this, context)
     this.drawMap(context, this.game.map.obstacles)
+    this.drawPlayer(this, context)
   }
 }
