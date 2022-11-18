@@ -17,30 +17,30 @@ export class Player {
     return({name: this.name, x: this.x, y: this.y, dir: this.dir, frame: this.frame, charno: this.charno})
   }
   update(input, deltaTime){
+    let dr = {x: 0, y: 0}
     if('ArrowRight' in input) {
-      this.x += this.speed;
-      this.dir = 'right';
+      dr.x += this.speed;
     }
     else if ('ArrowLeft' in input) {
-      this.x -= this.speed;
-      this.dir = 'left';
+      dr.x -= this.speed;
     }
     if('ArrowUp' in input) {
-      this.y -= this.speed;
-      this.dir = 'up';
+      dr.y -= this.speed;
     }
     else if ('ArrowDown' in input) {
-      this.y += this.speed;
-      this.dir = 'down';
+      dr.y += this.speed;
     }
     if('touch' in input){
       let t = input['touch']
       const o = this.viewPortOrigin()
       const rt = {x: t.x + o.x, y: t.y + o.y}
-      let dr = {x: rt.x - this.x, y: rt.y - this.y}
+      dr = {x: rt.x - this.x, y: rt.y - this.y}
       const l = Math.sqrt(dr.x*dr.x + dr.y*dr.y)
       dr.x = dr.x/l*this.speed
       dr.y = dr.y/l*this.speed
+    }
+      if(this.game.map.accessible(this.x + dr.x, this.y + dr.y, 
+        this.width, this.height)){
       this.x += dr.x
       this.y += dr.y
       // set direction
@@ -82,24 +82,24 @@ export class Player {
       c.y = mh-vh 
     return(c)
   }
-  drawMap(context){
+  drawMap(context, tiles){
     const o = this.viewPortOrigin()
     const vw = this.game.width
     const vh = this.game.height
     const map = this.game.map
-    const startCol = Math.floor(o.x / map.tsize);
-    let endCol = startCol + Math.round(vw / map.tsize);
-    if(endCol >= map.cols) endCol = map.cols - 1;
-    const startRow = Math.floor(o.y / map.tsize);
-    let endRow = startRow + Math.round(vh / map.tsize);
-    if(endRow >= map.rows) endRow = map.rows - 1;
-    const offsetX = -o.x + startCol * map.tsize;
-    const offsetY = -o.y + startRow * map.tsize;
-    for (var c = startCol; c <= endCol; c++) {
-      for (var r = startRow; r <= endRow; r++) {
-        var tile = map.getTile(c, r);
-        var x = (c - startCol) * map.tsize + offsetX;
-        var y = (r - startRow) * map.tsize + offsetY;
+    let start = map.getTileCoord(o.x, o.y)
+    let end = { ...start};
+    end.x += Math.round(vw / map.tsize);
+    end.y += Math.round(vh / map.tsize);
+    if(end.x >= map.cols) end.x = map.cols - 1;
+    if(end.y >= map.rows) end.y = map.rows - 1;
+    const offsetX = -o.x + start.x * map.tsize;
+    const offsetY = -o.y + start.y * map.tsize;
+    for (var c = start.x; c <= end.x; c++) {
+      for (var r = start.y; r <= end.y; r++) {
+        var tile = map.getTile(c, r, tiles);
+        var x = (c - start.x) * map.tsize + offsetX;
+        var y = (r - start.y) * map.tsize + offsetY;
         if (tile !== 0) { // 0 => empty tile
           context.drawImage(
             this.game.mapSprite, // image
@@ -115,8 +115,6 @@ export class Player {
         }
       }
     }
-    // 
-    // context.drawImage(this.game.mapSprite, o.x, o.y)
   }
   drawPlayer(p, context){
 
@@ -145,7 +143,7 @@ export class Player {
     context.fillText(p.name, x, y - (0.5 * this.height));
   }
   draw(context){
-    this.drawMap(context)
+    this.drawMap(context, this.game.map.tiles)
     for(let i in this.game.others) {
       const p = this.game.others[i]
       if(Math.abs(this.x - p.x) < this.game.width*0.5
@@ -154,5 +152,6 @@ export class Player {
       }
     }
     this.drawPlayer(this, context)
+    this.drawMap(context, this.game.map.obstacles)
   }
 }
