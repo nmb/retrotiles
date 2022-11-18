@@ -147,8 +147,8 @@ export class Player {
   }
   draw(context){
     this.drawMap(context, this.game.map.tiles)
-    for(let i in this.game.others) {
     this.drawMap(context, this.game.map.obstacles)
+    for(let i in this.game.others) {
       const p = this.game.others[i]
       if(Math.abs(this.x - p.x) < this.game.width
         && Math.abs(this.y - p.y) < this.game.height){
