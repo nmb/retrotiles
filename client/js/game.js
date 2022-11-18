@@ -9,9 +9,9 @@ export  class Game {
     this.height = height;
     this.mapSprite = mapSprite;
     this.playerSprites = playerSprites;
+    this.map = map;
     this.player = new Player(this);
     this.input = new InputHandler();
-    this.map = map;
     this.others = {};
     this.socket = io();
   }

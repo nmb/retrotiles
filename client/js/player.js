@@ -3,8 +3,10 @@ export class Player {
     this.game = game;
     this.width = 16;
     this.height = 16;
-    this.x = Math.random() * (this.game.width-this.width);
-    this.y = Math.random() * (this.game.height - this.height);
+    do {
+      this.x = Math.random() * (this.game.width-this.width);
+      this.y = Math.random() * (this.game.height - this.height);
+    } while(!game.map.accessible(this.x, this.y, this.width, this.height))
     this.dir = 'down';
     this.frame = 0;
     this.frameInterval = 100;
@@ -14,7 +16,8 @@ export class Player {
     this.charno = Math.floor(Math.random() * game.playerSprites.length)
   }
   info() {
-    return({name: this.name, x: this.x, y: this.y, dir: this.dir, frame: this.frame, charno: this.charno})
+    return({name: this.name, x: this.x, y: this.y, dir: this.dir, 
+      frame: this.frame, charno: this.charno})
   }
   update(input, deltaTime){
     let dr = {x: 0, y: 0}
