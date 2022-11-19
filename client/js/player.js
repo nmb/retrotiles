@@ -8,6 +8,7 @@ export class Player {
       this.y = Math.random() * (this.game.height - this.height);
     } while(!game.map.accessible(this.x, this.y, this.width, this.height))
     this.dir = 'down';
+    this.health = 100;
     this.frame = 0;
     this.frameInterval = 100;
     this.frameTimer = 0;
@@ -55,9 +56,11 @@ export class Player {
       }
     }
     if(this.x < 0) this.x = 0;
-    if(this.x > this.game.map.width() - this.width) this.x = this.game.map.width() - this.width;
+    if(this.x > this.game.map.width() - this.width) 
+      this.x = this.game.map.width() - this.width;
     if(this.y < 0) this.y = 0;
-    if(this.y > this.game.map.height() - this.height) this.y = this.game.map.height() - this.height;
+    if(this.y > this.game.map.height() - this.height) 
+      this.y = this.game.map.height() - this.height;
     if(Object.keys(input).length > 0 && this.frameTimer > this.frameInterval){
       this.frameTimer = 0;
       this.frame++;
@@ -85,8 +88,7 @@ export class Player {
       c.y = mh-vh 
     return(c)
   }
-  drawMap(context, tiles){
-    const o = this.viewPortOrigin()
+  drawMap(context, tiles, o){
     const vw = this.game.width
     const vh = this.game.height
     const map = this.game.map
@@ -119,7 +121,7 @@ export class Player {
       }
     }
   }
-  drawPlayer(p, context){
+  drawPlayer(p, context, o){
 
     // select player sprite from direction
     let imdx;
@@ -132,7 +134,6 @@ export class Player {
     else if(p.dir == 'right')
       imdx = 3;
     let x,y;
-    const o = this.viewPortOrigin()
     x = p.x - o.x
     y = p.y - o.y
     const sprite = this.game.playerSprites[p.charno]
@@ -146,15 +147,16 @@ export class Player {
     context.fillText(p.name, x, y - (0.5 * this.height));
   }
   draw(context){
-    this.drawMap(context, this.game.map.tiles)
-    this.drawMap(context, this.game.map.obstacles)
+    const o = this.viewPortOrigin()
+    this.drawMap(context, this.game.map.tiles, o)
+    this.drawMap(context, this.game.map.obstacles, o)
     for(let i in this.game.others) {
       const p = this.game.others[i]
-      if(Math.abs(this.x - p.x) < this.game.width
-        && Math.abs(this.y - p.y) < this.game.height){
-        this.drawPlayer(p, context)
+      if(p.x >= o.x && p.x < o.x + this.game.width
+        && p.y >= o.y && p.y < o.y + this.game.height){
+        this.drawPlayer(p, context, o)
       }
     }
-    this.drawPlayer(this, context)
+    this.drawPlayer(this, context, o)
   }
 }
