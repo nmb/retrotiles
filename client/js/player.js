@@ -9,6 +9,7 @@ export class Player {
     } while(!game.map.accessible(this.x, this.y, this.width, this.height))
     this.dir = 'down';
     this.health = 100;
+    this.tagged = false
     this.frame = 0;
     this.frameInterval = 100;
     this.frameTimer = 0;
@@ -17,8 +18,9 @@ export class Player {
     this.charno = Math.floor(Math.random() * game.playerSprites.length)
   }
   info() {
-    return({name: this.name, x: this.x, y: this.y, dir: this.dir, 
-      frame: this.frame, charno: this.charno})
+    return({name: this.name, health: this.health, x: this.x, y: this.y, dir: this.dir, 
+      frame: this.frame, charno: this.charno, tile: this.game.map.getTileCoord(this.x, this.y),
+    tagged: this.tagged})
   }
   update(input, deltaTime){
     let dr = {x: 0, y: 0}
@@ -158,5 +160,6 @@ export class Player {
       }
     }
     this.drawPlayer(this, context, o)
+    return o;
   }
 }

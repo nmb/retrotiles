@@ -34,6 +34,12 @@ window.addEventListener('load', async function(){
     }
 
   });
+  game.socket.on("tag", data => {
+    if(data == game.socket.id)
+      game.player["tagged"] = true
+    else if(game.others[data])
+    game.others[data]["tagged"] = true;
+  });
   game.socket.on("quitter", data => {
     delete game.others[data];
     sndEnd.play();
@@ -42,16 +48,19 @@ window.addEventListener('load', async function(){
     if(msg.id != game.socket.id)
     game.others[msg.id] = msg.data
   });
+  game.socket.on("players", msg => {
+    game.others = msg
+  });
   game.socket.emit("new", game.player.info())
 
   let lastTime = 0;
 
   function animate(timeStamp) {
     const deltaTime = timeStamp - lastTime;
+    game.update(deltaTime);
     lastTime = timeStamp;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    game.update(deltaTime);
-    game.draw(ctx);
+    game.draw(ctx, timeStamp);
     requestAnimationFrame(animate);
   }
   animate(0);
